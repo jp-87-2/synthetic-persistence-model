@@ -1,0 +1,551 @@
+{
+  "source": {
+    "csv": "data/synthetic_enrollment.csv",
+    "md5": "a8ba9a1f20e608b22eb90a622c0b6d05",
+    "records": 54954,
+    "students": 15932,
+    "as_of": "2025SP",
+    "population": "undergraduates, all entry types",
+    "engine": "replication/R/segment_model.R"
+  },
+  "entrant": {
+    "as_of": "2025SP",
+    "years": 4,
+    "schools": {
+      "MCM": {
+        "terms_per_year": 3,
+        "include_summer": true,
+        "spring_to_fall_offset": 2,
+        "rates": [0.781532, 0.740238, 0.545637, 0.673025, 0.6147, 0.366667, 0.574431, 0.541635, 0.261291, 0.525298, 0.465079, 0.273016],
+        "curve": [1, 0.7815, 0.5785, 0.4264, 0.287, 0.1764, 0.1052, 0.0604, 0.0327, 0.0158, 0.0083, 0.0039, 0.0023],
+        "entering": 661,
+        "charge_per_term": 47000,
+        "comp_fee_per_term": 0,
+        "aid_rate": 0.291673
+      },
+      "MCC": {
+        "terms_per_year": 2,
+        "include_summer": false,
+        "spring_to_fall_offset": 1,
+        "rates": [0.776681, 0.752225, 0.724349, 0.674304, 0.642187, 0.652932, 0.568377, 0.532799],
+        "curve": [1, 0.7767, 0.5842, 0.4232, 0.2854, 0.1833, 0.1197, 0.068, 0.0362],
+        "entering": 288,
+        "charge_per_term": 46996,
+        "comp_fee_per_term": 0,
+        "aid_rate": 0.290276
+      }
+    }
+  },
+  "cohort_matrix": {
+    "MCM": {
+      "rates": {
+        "noCovid": [0.781532, 0.740238, 0.545637, 0.673025, 0.6147, 0.366667, 0.574431, 0.541635, 0.261291, 0.525298, 0.465079, 0.273016],
+        "withCovid": [0.779491, 0.744473, 0.541714, 0.678409, 0.629538, 0.366191, 0.585035, 0.515601, 0.261291, 0.525298, 0.465079, 0.273016]
+      },
+      "spRates": {
+        "noCovid": [0.763509, 0.572261, 0.712037, 0.703112, 0.440114, 0.666193, 0.587335, 0.322293, 0.564148, 0.521173, 0.221251, 0.666667],
+        "withCovid": [0.76353, 0.568768, 0.710957, 0.689261, 0.449836, 0.666801, 0.572685, 0.322293, 0.564148, 0.521173, 0.221251, 0.666667]
+      },
+      "summer_uptake": 0.7402,
+      "cohorts": [
+        {
+          "cohortTerm": "2021FA",
+          "entrants": 491,
+          "intakeType": "fall",
+          "observed": {
+            "0": {
+              "calendarTerm": "2021FA",
+              "heads": 491
+            },
+            "1": {
+              "calendarTerm": "2022SP",
+              "heads": 380
+            },
+            "2": {
+              "calendarTerm": "2022SU",
+              "heads": 286
+            },
+            "3": {
+              "calendarTerm": "2022FA",
+              "heads": 216
+            },
+            "4": {
+              "calendarTerm": "2023SP",
+              "heads": 150
+            },
+            "5": {
+              "calendarTerm": "2023SU",
+              "heads": 83
+            },
+            "6": {
+              "calendarTerm": "2023FA",
+              "heads": 49
+            },
+            "7": {
+              "calendarTerm": "2024SP",
+              "heads": 25
+            },
+            "8": {
+              "calendarTerm": "2024SU",
+              "heads": 14
+            },
+            "9": {
+              "calendarTerm": "2024FA",
+              "heads": 8
+            },
+            "10": {
+              "calendarTerm": "2025SP",
+              "heads": 3
+            }
+          }
+        },
+        {
+          "cohortTerm": "2022SP",
+          "entrants": 559,
+          "intakeType": "spring",
+          "observed": {
+            "0": {
+              "calendarTerm": "2022SP",
+              "heads": 559
+            },
+            "1": {
+              "calendarTerm": "2022SU",
+              "heads": 419
+            },
+            "2": {
+              "calendarTerm": "2022FA",
+              "heads": 325
+            },
+            "3": {
+              "calendarTerm": "2023SP",
+              "heads": 241
+            },
+            "4": {
+              "calendarTerm": "2023SU",
+              "heads": 177
+            },
+            "5": {
+              "calendarTerm": "2023FA",
+              "heads": 113
+            },
+            "6": {
+              "calendarTerm": "2024SP",
+              "heads": 77
+            },
+            "7": {
+              "calendarTerm": "2024SU",
+              "heads": 47
+            },
+            "8": {
+              "calendarTerm": "2024FA",
+              "heads": 26
+            },
+            "9": {
+              "calendarTerm": "2025SP",
+              "heads": 18
+            }
+          }
+        },
+        {
+          "cohortTerm": "2022FA",
+          "entrants": 744,
+          "intakeType": "fall",
+          "observed": {
+            "0": {
+              "calendarTerm": "2022FA",
+              "heads": 744
+            },
+            "1": {
+              "calendarTerm": "2023SP",
+              "heads": 579
+            },
+            "2": {
+              "calendarTerm": "2023SU",
+              "heads": 429
+            },
+            "3": {
+              "calendarTerm": "2023FA",
+              "heads": 323
+            },
+            "4": {
+              "calendarTerm": "2024SP",
+              "heads": 221
+            },
+            "5": {
+              "calendarTerm": "2024SU",
+              "heads": 142
+            },
+            "6": {
+              "calendarTerm": "2024FA",
+              "heads": 87
+            },
+            "7": {
+              "calendarTerm": "2025SP",
+              "heads": 52
+            }
+          }
+        },
+        {
+          "cohortTerm": "2023SP",
+          "entrants": 589,
+          "intakeType": "spring",
+          "observed": {
+            "0": {
+              "calendarTerm": "2023SP",
+              "heads": 589
+            },
+            "1": {
+              "calendarTerm": "2023SU",
+              "heads": 454
+            },
+            "2": {
+              "calendarTerm": "2023FA",
+              "heads": 348
+            },
+            "3": {
+              "calendarTerm": "2024SP",
+              "heads": 248
+            },
+            "4": {
+              "calendarTerm": "2024SU",
+              "heads": 171
+            },
+            "5": {
+              "calendarTerm": "2024FA",
+              "heads": 113
+            },
+            "6": {
+              "calendarTerm": "2025SP",
+              "heads": 75
+            }
+          }
+        },
+        {
+          "cohortTerm": "2023FA",
+          "entrants": 595,
+          "intakeType": "fall",
+          "observed": {
+            "0": {
+              "calendarTerm": "2023FA",
+              "heads": 595
+            },
+            "1": {
+              "calendarTerm": "2024SP",
+              "heads": 475
+            },
+            "2": {
+              "calendarTerm": "2024SU",
+              "heads": 355
+            },
+            "3": {
+              "calendarTerm": "2024FA",
+              "heads": 235
+            },
+            "4": {
+              "calendarTerm": "2025SP",
+              "heads": 157
+            }
+          }
+        },
+        {
+          "cohortTerm": "2024SP",
+          "entrants": 797,
+          "intakeType": "spring",
+          "observed": {
+            "0": {
+              "calendarTerm": "2024SP",
+              "heads": 797
+            },
+            "1": {
+              "calendarTerm": "2024SU",
+              "heads": 608
+            },
+            "2": {
+              "calendarTerm": "2024FA",
+              "heads": 437
+            },
+            "3": {
+              "calendarTerm": "2025SP",
+              "heads": 306
+            }
+          }
+        },
+        {
+          "cohortTerm": "2024FA",
+          "entrants": 645,
+          "intakeType": "fall",
+          "observed": {
+            "0": {
+              "calendarTerm": "2024FA",
+              "heads": 645
+            },
+            "1": {
+              "calendarTerm": "2025SP",
+              "heads": 498
+            }
+          }
+        },
+        {
+          "cohortTerm": "2025SP",
+          "entrants": 868,
+          "intakeType": "spring",
+          "observed": {
+            "0": {
+              "calendarTerm": "2025SP",
+              "heads": 868
+            }
+          }
+        },
+        {
+          "cohortTerm": "2025FA",
+          "entrants": 661,
+          "intakeType": "fall",
+          "observed": {}
+        },
+        {
+          "cohortTerm": "2026SP",
+          "entrants": 751,
+          "intakeType": "spring",
+          "observed": {}
+        },
+        {
+          "cohortTerm": "2026FA",
+          "entrants": 661,
+          "intakeType": "fall",
+          "observed": {}
+        }
+      ]
+    },
+    "MCC": {
+      "rates": {
+        "noCovid": [0.776681, 0.752225, 0.724349, 0.674304, 0.642187, 0.652932, 0.568377, 0.532799],
+        "withCovid": [0.772775, 0.748939, 0.72722, 0.669443, 0.631698, 0.652932, 0.568377, 0.532799]
+      },
+      "spRates": {
+        "noCovid": [0.772812, 0.751344, 0.71914, 0.674069, 0.644271, 0.519971, 0.629701, 0.577991],
+        "withCovid": [0.767634, 0.744878, 0.725914, 0.684855, 0.644271, 0.519971, 0.629701, 0.577991]
+      },
+      "summer_uptake": null,
+      "cohorts": [
+        {
+          "cohortTerm": "2021FA",
+          "entrants": 193,
+          "intakeType": "fall",
+          "observed": {
+            "0": {
+              "calendarTerm": "2021FA",
+              "heads": 193
+            },
+            "1": {
+              "calendarTerm": "2022SP",
+              "heads": 150
+            },
+            "2": {
+              "calendarTerm": "2022FA",
+              "heads": 113
+            },
+            "3": {
+              "calendarTerm": "2023SP",
+              "heads": 82
+            },
+            "4": {
+              "calendarTerm": "2023FA",
+              "heads": 53
+            },
+            "5": {
+              "calendarTerm": "2024SP",
+              "heads": 34
+            },
+            "6": {
+              "calendarTerm": "2024FA",
+              "heads": 23
+            },
+            "7": {
+              "calendarTerm": "2025SP",
+              "heads": 10
+            }
+          }
+        },
+        {
+          "cohortTerm": "2022SP",
+          "entrants": 246,
+          "intakeType": "spring",
+          "observed": {
+            "0": {
+              "calendarTerm": "2022SP",
+              "heads": 246
+            },
+            "1": {
+              "calendarTerm": "2022FA",
+              "heads": 198
+            },
+            "2": {
+              "calendarTerm": "2023SP",
+              "heads": 139
+            },
+            "3": {
+              "calendarTerm": "2023FA",
+              "heads": 96
+            },
+            "4": {
+              "calendarTerm": "2024SP",
+              "heads": 61
+            },
+            "5": {
+              "calendarTerm": "2024FA",
+              "heads": 37
+            },
+            "6": {
+              "calendarTerm": "2025SP",
+              "heads": 19
+            }
+          }
+        },
+        {
+          "cohortTerm": "2022FA",
+          "entrants": 298,
+          "intakeType": "fall",
+          "observed": {
+            "0": {
+              "calendarTerm": "2022FA",
+              "heads": 298
+            },
+            "1": {
+              "calendarTerm": "2023SP",
+              "heads": 235
+            },
+            "2": {
+              "calendarTerm": "2023FA",
+              "heads": 168
+            },
+            "3": {
+              "calendarTerm": "2024SP",
+              "heads": 126
+            },
+            "4": {
+              "calendarTerm": "2024FA",
+              "heads": 80
+            },
+            "5": {
+              "calendarTerm": "2025SP",
+              "heads": 52
+            }
+          }
+        },
+        {
+          "cohortTerm": "2023SP",
+          "entrants": 238,
+          "intakeType": "spring",
+          "observed": {
+            "0": {
+              "calendarTerm": "2023SP",
+              "heads": 238
+            },
+            "1": {
+              "calendarTerm": "2023FA",
+              "heads": 180
+            },
+            "2": {
+              "calendarTerm": "2024SP",
+              "heads": 143
+            },
+            "3": {
+              "calendarTerm": "2024FA",
+              "heads": 105
+            },
+            "4": {
+              "calendarTerm": "2025SP",
+              "heads": 73
+            }
+          }
+        },
+        {
+          "cohortTerm": "2023FA",
+          "entrants": 281,
+          "intakeType": "fall",
+          "observed": {
+            "0": {
+              "calendarTerm": "2023FA",
+              "heads": 281
+            },
+            "1": {
+              "calendarTerm": "2024SP",
+              "heads": 222
+            },
+            "2": {
+              "calendarTerm": "2024FA",
+              "heads": 163
+            },
+            "3": {
+              "calendarTerm": "2025SP",
+              "heads": 113
+            }
+          }
+        },
+        {
+          "cohortTerm": "2024SP",
+          "entrants": 349,
+          "intakeType": "spring",
+          "observed": {
+            "0": {
+              "calendarTerm": "2024SP",
+              "heads": 349
+            },
+            "1": {
+              "calendarTerm": "2024FA",
+              "heads": 274
+            },
+            "2": {
+              "calendarTerm": "2025SP",
+              "heads": 208
+            }
+          }
+        },
+        {
+          "cohortTerm": "2024FA",
+          "entrants": 284,
+          "intakeType": "fall",
+          "observed": {
+            "0": {
+              "calendarTerm": "2024FA",
+              "heads": 284
+            },
+            "1": {
+              "calendarTerm": "2025SP",
+              "heads": 227
+            }
+          }
+        },
+        {
+          "cohortTerm": "2025SP",
+          "entrants": 369,
+          "intakeType": "spring",
+          "observed": {
+            "0": {
+              "calendarTerm": "2025SP",
+              "heads": 369
+            }
+          }
+        },
+        {
+          "cohortTerm": "2025FA",
+          "entrants": 288,
+          "intakeType": "fall",
+          "observed": {}
+        },
+        {
+          "cohortTerm": "2026SP",
+          "entrants": 319,
+          "intakeType": "spring",
+          "observed": {}
+        },
+        {
+          "cohortTerm": "2026FA",
+          "entrants": 288,
+          "intakeType": "fall",
+          "observed": {}
+        }
+      ]
+    }
+  }
+}

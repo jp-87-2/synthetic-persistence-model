@@ -1,0 +1,418 @@
+{
+  "data": {
+    "records": 54954,
+    "students": 15932,
+    "md5": "a8ba9a1f20e608b22eb90a622c0b6d05"
+  },
+  "scenarios": {
+    "flat": [
+      {
+        "fall": "2026FA",
+        "headcount": 5464,
+        "ntr_m": 104.1,
+        "p10_m": 101.9,
+        "p90_m": 106.4
+      },
+      {
+        "fall": "2027FA",
+        "headcount": 5233,
+        "ntr_m": 99.7,
+        "p10_m": 97.5,
+        "p90_m": 102.1
+      },
+      {
+        "fall": "2028FA",
+        "headcount": 5102,
+        "ntr_m": 97.2,
+        "p10_m": 94.8,
+        "p90_m": 99.5
+      },
+      {
+        "fall": "2029FA",
+        "headcount": 5029,
+        "ntr_m": 95.8,
+        "p10_m": 93.5,
+        "p90_m": 98.3
+      },
+      {
+        "fall": "2030FA",
+        "headcount": 4966,
+        "ntr_m": 94.6,
+        "p10_m": 92.3,
+        "p90_m": 97.1
+      }
+    ],
+    "cliff": [
+      {
+        "fall": "2026FA",
+        "headcount": 5464,
+        "ntr_m": 104.1,
+        "p10_m": 101.9,
+        "p90_m": 106.4
+      },
+      {
+        "fall": "2027FA",
+        "headcount": 5196,
+        "ntr_m": 99,
+        "p10_m": 96.8,
+        "p90_m": 101.4
+      },
+      {
+        "fall": "2028FA",
+        "headcount": 5013,
+        "ntr_m": 95.5,
+        "p10_m": 93.2,
+        "p90_m": 97.8
+      },
+      {
+        "fall": "2029FA",
+        "headcount": 4897,
+        "ntr_m": 93.3,
+        "p10_m": 91,
+        "p90_m": 95.7
+      },
+      {
+        "fall": "2030FA",
+        "headcount": 4798,
+        "ntr_m": 91.4,
+        "p10_m": 89.1,
+        "p90_m": 93.8
+      }
+    ],
+    "northeast": [
+      {
+        "fall": "2026FA",
+        "headcount": 5464,
+        "ntr_m": 104.1,
+        "p10_m": 101.9,
+        "p90_m": 106.4
+      },
+      {
+        "fall": "2027FA",
+        "headcount": 5170,
+        "ntr_m": 98.5,
+        "p10_m": 96.4,
+        "p90_m": 101.2
+      },
+      {
+        "fall": "2028FA",
+        "headcount": 4955,
+        "ntr_m": 94.4,
+        "p10_m": 92.3,
+        "p90_m": 96.7
+      },
+      {
+        "fall": "2029FA",
+        "headcount": 4798,
+        "ntr_m": 91.4,
+        "p10_m": 89.2,
+        "p90_m": 93.8
+      },
+      {
+        "fall": "2030FA",
+        "headcount": 4666,
+        "ntr_m": 88.9,
+        "p10_m": 86.8,
+        "p90_m": 91.1
+      }
+    ]
+  },
+  "vintage": [
+    {
+      "cohort": "2021FA",
+      "entrants": 1345,
+      "terms_scored": 13,
+      "actual_heads": 9684,
+      "expected_heads": 9560,
+      "rate_alpha_heads": 124,
+      "mix_alpha_heads": 12,
+      "total_alpha_ntr_m": 2.59
+    },
+    {
+      "cohort": "2022SP",
+      "entrants": 244,
+      "terms_scored": 12,
+      "actual_heads": 1708,
+      "expected_heads": 1676,
+      "rate_alpha_heads": 32,
+      "mix_alpha_heads": -3,
+      "total_alpha_ntr_m": 0.55
+    },
+    {
+      "cohort": "2022FA",
+      "entrants": 1245,
+      "terms_scored": 10,
+      "actual_heads": 7851,
+      "expected_heads": 7787,
+      "rate_alpha_heads": 64,
+      "mix_alpha_heads": 10,
+      "total_alpha_ntr_m": 1.41
+    },
+    {
+      "cohort": "2023SP",
+      "entrants": 182,
+      "terms_scored": 9,
+      "actual_heads": 1046,
+      "expected_heads": 1024,
+      "rate_alpha_heads": 22,
+      "mix_alpha_heads": 4,
+      "total_alpha_ntr_m": 0.49
+    },
+    {
+      "cohort": "2023FA",
+      "entrants": 1111,
+      "terms_scored": 7,
+      "actual_heads": 5440,
+      "expected_heads": 5223,
+      "rate_alpha_heads": 217,
+      "mix_alpha_heads": -12,
+      "total_alpha_ntr_m": 3.9
+    },
+    {
+      "cohort": "2024SP",
+      "entrants": 186,
+      "terms_scored": 6,
+      "actual_heads": 749,
+      "expected_heads": 763,
+      "rate_alpha_heads": -14,
+      "mix_alpha_heads": 3,
+      "total_alpha_ntr_m": -0.21
+    },
+    {
+      "cohort": "2024FA",
+      "entrants": 1159,
+      "terms_scored": 4,
+      "actual_heads": 3347,
+      "expected_heads": 3398,
+      "rate_alpha_heads": -51,
+      "mix_alpha_heads": -8,
+      "total_alpha_ntr_m": -1.12
+    }
+  ],
+  "discount_tiers": [
+    {
+      "tier_id": 1,
+      "discount_description": "No Award",
+      "discount_range": "< 15% Discount",
+      "school": "MCM",
+      "headcount": 482,
+      "gross_tuition": 25660,
+      "institutional_grant": 1150,
+      "comp_fee": 750,
+      "mean_ntr": 25260,
+      "discount_rate": 0.0448,
+      "first_year_retention": 0.852,
+      "exit_hazard": 0.148,
+      "retained_ntr": 10373373,
+      "ntr_at_risk": 1801947
+    },
+    {
+      "tier_id": 2,
+      "discount_description": "Minimal Aid",
+      "discount_range": "15% – 35% Discount",
+      "school": "MCM",
+      "headcount": 395,
+      "gross_tuition": 25660,
+      "institutional_grant": 6415,
+      "comp_fee": 750,
+      "mean_ntr": 19995,
+      "discount_rate": 0.25,
+      "first_year_retention": 0.864,
+      "exit_hazard": 0.136,
+      "retained_ntr": 6823894,
+      "ntr_at_risk": 1074131
+    },
+    {
+      "tier_id": 3,
+      "discount_description": "Partial Aid",
+      "discount_range": "35% – 60% Discount",
+      "school": "MCM",
+      "headcount": 318,
+      "gross_tuition": 25660,
+      "institutional_grant": 12060,
+      "comp_fee": 750,
+      "mean_ntr": 14350,
+      "discount_rate": 0.47,
+      "first_year_retention": 0.871,
+      "exit_hazard": 0.129,
+      "retained_ntr": 3974627,
+      "ntr_at_risk": 588673
+    },
+    {
+      "tier_id": 4,
+      "discount_description": "Substantial Aid",
+      "discount_range": "60% – 80% Discount",
+      "school": "MCM",
+      "headcount": 176,
+      "gross_tuition": 25660,
+      "institutional_grant": 17705,
+      "comp_fee": 750,
+      "mean_ntr": 8705,
+      "discount_rate": 0.69,
+      "first_year_retention": 0.892,
+      "exit_hazard": 0.108,
+      "retained_ntr": 1366615,
+      "ntr_at_risk": 165465
+    },
+    {
+      "tier_id": 5,
+      "discount_description": "Near-Full Aid",
+      "discount_range": ">= 80% Discount",
+      "school": "MCM",
+      "headcount": 96,
+      "gross_tuition": 25660,
+      "institutional_grant": 23094,
+      "comp_fee": 750,
+      "mean_ntr": 3316,
+      "discount_rate": 0.9,
+      "first_year_retention": 0.918,
+      "exit_hazard": 0.082,
+      "retained_ntr": 292232,
+      "ntr_at_risk": 26104
+    }
+  ],
+  "risk_cells": [
+    {
+      "school": "MCM",
+      "degree": "Bachelor",
+      "aid_band": "No Award",
+      "entry_season": "FA",
+      "duration": 0,
+      "headcount": 482,
+      "mean_ntr": 25260,
+      "prevalence": 0.3286,
+      "exit_hazard": 0.148,
+      "lift": 1.064,
+      "ntr_at_risk": 1801946.9
+    },
+    {
+      "school": "MCM",
+      "degree": "Bachelor",
+      "aid_band": "Minimal Aid",
+      "entry_season": "FA",
+      "duration": 0,
+      "headcount": 395,
+      "mean_ntr": 19995,
+      "prevalence": 0.2693,
+      "exit_hazard": 0.136,
+      "lift": 0.978,
+      "ntr_at_risk": 1074131.4
+    },
+    {
+      "school": "MCM",
+      "degree": "Bachelor",
+      "aid_band": "Partial Aid",
+      "entry_season": "FA",
+      "duration": 0,
+      "headcount": 318,
+      "mean_ntr": 14350,
+      "prevalence": 0.2168,
+      "exit_hazard": 0.129,
+      "lift": 0.928,
+      "ntr_at_risk": 588673.1
+    },
+    {
+      "school": "MCC",
+      "degree": "Bachelor",
+      "aid_band": "No Award",
+      "entry_season": "FA",
+      "duration": 0,
+      "headcount": 148,
+      "mean_ntr": 25450,
+      "prevalence": 0.1009,
+      "exit_hazard": 0.151,
+      "lift": 1.086,
+      "ntr_at_risk": 568756.6
+    },
+    {
+      "school": "MCC",
+      "degree": "Bachelor",
+      "aid_band": "Minimal Aid",
+      "entry_season": "FA",
+      "duration": 0,
+      "headcount": 112,
+      "mean_ntr": 20120,
+      "prevalence": 0.0763,
+      "exit_hazard": 0.142,
+      "lift": 1.021,
+      "ntr_at_risk": 319988.5
+    },
+    {
+      "school": "MCC",
+      "degree": "Bachelor",
+      "aid_band": "Partial Aid",
+      "entry_season": "FA",
+      "duration": 0,
+      "headcount": 96,
+      "mean_ntr": 14490,
+      "prevalence": 0.0654,
+      "exit_hazard": 0.134,
+      "lift": 0.964,
+      "ntr_at_risk": 186399.4
+    },
+    {
+      "school": "MCM",
+      "degree": "Bachelor",
+      "aid_band": "Substantial Aid",
+      "entry_season": "FA",
+      "duration": 0,
+      "headcount": 176,
+      "mean_ntr": 8705,
+      "prevalence": 0.12,
+      "exit_hazard": 0.108,
+      "lift": 0.777,
+      "ntr_at_risk": 165464.6
+    },
+    {
+      "school": "MCM",
+      "degree": "Bachelor",
+      "aid_band": "Near-Full Aid",
+      "entry_season": "FA",
+      "duration": 0,
+      "headcount": 96,
+      "mean_ntr": 3316,
+      "prevalence": 0.0654,
+      "exit_hazard": 0.082,
+      "lift": 0.59,
+      "ntr_at_risk": 26103.6
+    }
+  ],
+  "entrant": {
+    "note": "numbers come from computed.json (replication/R/export_site_data.R)",
+    "schools": {
+      "MCM": {
+        "name": "Millbury College of Music (MCM)",
+        "calendar_label": "3-Term Calendar (Fall, Spring, Optional Summer · offset = 2)"
+      },
+      "MCC": {
+        "name": "Millbury College Conservatory (MCC)",
+        "calendar_label": "2-Term Calendar (Fall & Spring Only · offset = 1)"
+      }
+    }
+  },
+  "meta": {
+    "version": "0.2.1",
+    "git_sha": "d50c64f",
+    "python": "3.12.9",
+    "numpy": "2.2.3",
+    "pandas": "2.2.3",
+    "interval_level": 0.8,
+    "seed": 42,
+    "report_as_of": "2025FA"
+  },
+  "wiche": {
+    "source": "WICHE, Knocking at the College Door, 11th edition (Dec 2024)",
+    "end_year": 2030,
+    "national": {
+      "peak_year": 2025,
+      "change": -0.0555
+    },
+    "northeast": {
+      "peak_year": 2025,
+      "change": -0.0755
+    }
+  },
+  "published": true,
+  "repo_url": "https://github.com/jp-87-2/synthetic-persistence-model",
+  "linkedin_url": "https://www.linkedin.com/in/schofieldj87/"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Student Persistence Model",
+  "description": "Two-stage Higher Education enrollment and Net Tuition Revenue (NTR) cohort survival model across multi-term academic calendars, tuition discount tiers, and WICHE 2030 demographic scenarios.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

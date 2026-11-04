@@ -1,0 +1,583 @@
+---
+title: "Persistence Model Companion"
+subtitle: "Every number on the site, recalculated from synthetic_enrollment.csv"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    df_print: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+knitr::opts_chunk$set(comment = "", echo = TRUE, message = FALSE, warning = FALSE)
+options(width = 140, scipen = 999)
+```
+
+This is a working notebook, not a report. It runs the same engine the site uses
+(`replication/R/segment_model.R`) on the same file (`data/synthetic_enrollment.csv`)
+and prints every intermediate table along the way. The site reads its numbers from
+`src/data/computed.json`, which `replication/R/export_site_data.R` writes. The last
+section checks that file against what is calculated here.
+
+Settings used throughout:
+
+- Data cutoff (`DATA_DATE`): 2025SP. This is the last term with an entering class in the CSV.
+- Population: undergraduates, all entry types, one matrix per school.
+- MCM: 3 terms per year (summer, fall, spring), 12 terms tracked, offset 2 for fall returns.
+- MCC: 2 terms per year (fall, spring), 8 terms tracked, summer rows dropped, offset 1.
+- Rates: simple mean of per-cohort ratios, a cohort counted only if both cells are above 0,
+  COVID terms excluded, no cap. These are the 2025 notebook defaults.
+
+# 1. Load data
+
+```{r load}
+CSV <- "data/synthetic_enrollment.csv"
+d <- read.csv(CSV, stringsAsFactors = FALSE)
+DATA_DATE_TERM <- "2025SP"
+
+dim(d)
+names(d)
+head(d, 10)
+```
+
+```{r data-checks}
+nrow(d)
+length(unique(d$student_id))
+unname(tools::md5sum(CSV))
+```
+
+```{r data-tables}
+table(d$school)
+table(d$student_program)
+table(d$school, d$student_program)
+table(d$entry_type)
+table(substr(d$term_code, 5, 6))
+range(d$term_code)
+sort(unique(d$cohort_term))
+```
+
+Count of records by term. Note the records continue past the last entering class.
+
+```{r term-counts}
+tc <- table(d$term_code)
+tc[order(names(tc))]
+```
+
+Entering-class size by cohort term, by school (all programs).
+
+```{r entering-by-school}
+ent_rows <- d[d$term_code == d$cohort_term, ]
+table(ent_rows$cohort_term, ent_rows$school)
+```
+
+# 2. Engine code
+
+The engine is sourced, not copied, so the code below is exactly what the site exporter runs.
+
+```{r engine-source}
+source("replication/R/segment_model.R")
+```
+
+```{r engine-print, code=readLines("replication/R/segment_model.R"), eval=FALSE}
+```
+
+# 3. Term coding
+
+```{r term-coding}
+ex <- c("2020SP", "2020SU", "2020FA", "2021SP", "2021SU", "2021FA",
+        "2024FA", "2025SP", "2025SU", "2025FA", "2026SP", "2026SU", "2026FA")
+data.frame(term = ex, term_int = term_to_int(ex), back = int_to_term(term_to_int(ex)),
+           pos_mcm = term_pos(term_to_int(ex), 3L))
+```
+
+The integers sort in calendar order:
+
+```{r term-sort}
+sort(term_to_int(ex))
+int_to_term(sort(term_to_int(ex)))
+```
+
+COVID terms excluded from the rates:
+
+```{r covid}
+COVID_TERMS
+int_to_term(COVID_TERMS)
+DATA_DATE <- term_to_int(DATA_DATE_TERM)
+DATA_DATE
+```
+
+Calendar term reached d terms after entry, for a fall cohort on each calendar:
+
+```{r cal-term}
+data.frame(d = 0:12, mcm = int_to_term(cal_term(term_to_int("2025FA"), 0:12, 3L)))
+data.frame(d = 0:8, mcc = int_to_term(cal_term(term_to_int("2025FA"), 0:8, 2L)))
+```
+
+Reference offset by step, fall cohort on MCM. Fall returns (d = 3, 6, 9, 12) look back 2 terms to spring.
+
+```{r ref-offset}
+sapply(1:12, function(k) ref_offset(term_to_int("2025FA"), k, 3L))
+sapply(1:12, function(k) ref_offset(term_to_int("2025SP"), k, 3L))
+sapply(1:8, function(k) ref_offset(term_to_int("2025FA"), k, 2L))
+```
+
+# 4. Population
+
+```{r population}
+mcm_r <- d[d$school == "MCM" & d$student_program == "Undergraduate", ]
+mcc_r <- d[d$school == "MCC" & d$student_program == "Undergraduate", ]
+nrow(mcm_r); length(unique(mcm_r$student_id))
+nrow(mcc_r); length(unique(mcc_r$student_id))
+table(mcm_r$entry_type)
+table(mcc_r$entry_type)
+```
+
+Summer records at MCC (dropped in the 2-term matrix):
+
+```{r mcc-summer}
+sum(grepl("SU$", mcc_r$term_code))
+```
+
+Duplicate student-term rows (dropped by `cohort_matrix`):
+
+```{r dups}
+sum(duplicated(mcm_r[c("student_id", "term_code")]))
+sum(duplicated(mcc_r[c("student_id", "term_code")]))
+```
+
+# 5. Cohort matrices
+
+Rows are terms since entry (d), columns are cohorts (term_int). Cells are distinct students enrolled.
+Cells past the data cutoff are still filled here because the CSV has records past 2025SP; the
+rate and projection functions ignore them.
+
+## MCM
+
+```{r mcm-matrix}
+m_mcm <- cohort_matrix(mcm_r, 3L, 12L)
+dim(m_mcm)
+colnames(m_mcm)
+int_to_term(as.integer(colnames(m_mcm)))
+m_mcm
+```
+
+## MCC
+
+```{r mcc-matrix}
+m_mcc <- cohort_matrix(mcc_r, 2L, 8L)
+dim(m_mcc)
+int_to_term(as.integer(colnames(m_mcc)))
+m_mcc
+```
+
+## Observed portion only (cells at or before 2025SP)
+
+```{r observed-only}
+mask_obs <- function(m, tpy) {
+  cs <- as.integer(colnames(m)); m <- m[, cs <= DATA_DATE, drop = FALSE]; cs <- as.integer(colnames(m))
+  for (j in seq_along(cs)) for (k in 0:(nrow(m) - 1L)) if (cal_term(cs[j], k, tpy) > DATA_DATE) m[k + 1L, j] <- NA
+  colnames(m) <- int_to_term(cs); m
+}
+mask_obs(m_mcm, 3L)
+mask_obs(m_mcc, 2L)
+```
+
+# 6. Normalized cohorts
+
+Each cohort divided by its entering headcount. Blank where not yet observed.
+
+```{r normalized}
+round(normalize_cohorts(m_mcm, 3L, DATA_DATE), 4)
+round(normalize_cohorts(m_mcc, 2L, DATA_DATE), 4)
+```
+
+# 7. Continuation rates
+
+Rate at step d = mean over cohorts of (heads at d) / (heads at d - offset), by entry season.
+
+## MCM
+
+```{r mcm-rates}
+r_mcm      <- segment_rates(m_mcm, 3L, DATA_DATE)
+r_mcm_cov  <- segment_rates(m_mcm, 3L, DATA_DATE, exclude_covid = FALSE)
+r_mcm_3yr  <- segment_rates(m_mcm, 3L, DATA_DATE, years = 3)
+round(r_mcm, 6)
+round(r_mcm_cov, 6)
+round(r_mcm_3yr, 6)
+```
+
+Difference, COVID included minus excluded:
+
+```{r mcm-rates-diff}
+round(r_mcm_cov - r_mcm, 6)
+```
+
+How many cohorts went into each MCM fall-entrant rate (no COVID):
+
+```{r mcm-rate-n}
+n_used <- function(m, tpy, s, exclude_covid = TRUE) {
+  cs <- as.integer(colnames(m))
+  sapply(1:(nrow(m) - 1L), function(k) sum(sapply(which(season(cs) == s), function(j) {
+    cal <- cal_term(cs[j], k, tpy)
+    if (cal > DATA_DATE || (exclude_covid && cal %in% COVID_TERMS)) return(FALSE)
+    m[k + 1L, j] > 0 && m[k + 1L - ref_offset(cs[j], k, tpy), j] > 0
+  })))
+}
+n_used(m_mcm, 3L, "FA")
+n_used(m_mcm, 3L, "SP")
+```
+
+Per-cohort ratios behind the MCM fall-entrant rate at each step (the mean of each row is the rate):
+
+```{r mcm-ratios}
+ratios <- function(m, tpy, s) {
+  cs <- as.integer(colnames(m)); js <- which(season(cs) == s)
+  out <- matrix(NA_real_, nrow(m) - 1L, length(js), dimnames = list(1:(nrow(m) - 1L), int_to_term(cs[js])))
+  for (k in 1:(nrow(m) - 1L)) for (i in seq_along(js)) {
+    j <- js[i]; cal <- cal_term(cs[j], k, tpy)
+    if (cal > DATA_DATE || cal %in% COVID_TERMS) next
+    a <- m[k + 1L, j]; b <- m[k + 1L - ref_offset(cs[j], k, tpy), j]
+    if (a > 0 && b > 0) out[k, i] <- a / b
+  }
+  round(out, 4)
+}
+ratios(m_mcm, 3L, "FA")
+ratios(m_mcm, 3L, "SP")
+```
+
+## MCC
+
+```{r mcc-rates}
+r_mcc      <- segment_rates(m_mcc, 2L, DATA_DATE)
+r_mcc_cov  <- segment_rates(m_mcc, 2L, DATA_DATE, exclude_covid = FALSE)
+r_mcc_3yr  <- segment_rates(m_mcc, 2L, DATA_DATE, years = 3)
+round(r_mcc, 6)
+round(r_mcc_cov, 6)
+round(r_mcc_3yr, 6)
+round(r_mcc_cov - r_mcc, 6)
+n_used(m_mcc, 2L, "FA")
+n_used(m_mcc, 2L, "SP")
+ratios(m_mcc, 2L, "FA")
+ratios(m_mcc, 2L, "SP")
+```
+
+## Opt-in variants (not used on the site)
+
+Size-weighted pooling and the cap at 1, for comparison only.
+
+```{r optin}
+round(segment_rates(m_mcm, 3L, DATA_DATE, weighted = TRUE), 6)
+round(segment_rates(m_mcm, 3L, DATA_DATE, cap = TRUE), 6)
+round(segment_rates(m_mcc, 2L, DATA_DATE, weighted = TRUE), 6)
+```
+
+## Summer uptake (MCM)
+
+The step-2 rate for fall entrants is summer heads over spring heads. The site prints this as summer uptake.
+
+```{r summer-uptake}
+r_mcm["2", "FA"]
+round(r_mcm["2", "FA"] * 100, 1)
+```
+
+# 8. Persistence curves
+
+Share of an entering class still enrolled d terms after entry. heads(d) = entering x persistence(d).
+
+```{r curves}
+pc_mcm_fa <- persistence_curve(r_mcm, 3L, "2025FA")
+pc_mcm_sp <- persistence_curve(r_mcm, 3L, "2026SP")
+pc_mcc_fa <- persistence_curve(r_mcc, 2L, "2025FA")
+pc_mcc_sp <- persistence_curve(r_mcc, 2L, "2026SP")
+pc_mcm_fa
+pc_mcm_sp
+pc_mcc_fa
+pc_mcc_sp
+```
+
+Same, COVID terms included:
+
+```{r curves-cov}
+persistence_curve(r_mcm_cov, 3L, "2025FA")
+persistence_curve(r_mcc_cov, 2L, "2025FA")
+```
+
+Year-2 fall retention (fall entrants, d = terms per year):
+
+```{r y2}
+pc_mcm_fa$persistence[pc_mcm_fa$d == 3]
+pc_mcc_fa$persistence[pc_mcc_fa$d == 2]
+```
+
+Naive offset 1 on MCM (fall conditioned on summer instead of spring), for the inspector's toggle:
+
+```{r naive}
+naive_curve <- function(rates, n) { p <- numeric(n + 1); p[1] <- 1
+  for (k in 1:n) p[k + 1] <- p[k] * ifelse(is.na(rates[k + 1, "FA"]), 0, rates[k + 1, "FA"]); round(p, 4) }
+naive_curve(r_mcm, 12)
+naive_curve(r_mcm, 12)[4]
+```
+
+# 9. Entering-class placeholders
+
+Mean of the last 3 entering classes of the same season, at or before 2025SP. These stand in for
+admissions targets.
+
+```{r entering}
+ent_mcm <- default_entering(m_mcm, DATA_DATE, c("2025FA", "2026SP", "2026FA"))
+ent_mcc <- default_entering(m_mcc, DATA_DATE, c("2025FA", "2026SP", "2026FA"))
+ent_mcm
+ent_mcc
+```
+
+The three classes averaged:
+
+```{r entering-detail}
+last3 <- function(m, s) { cs <- as.integer(colnames(m)); x <- tail(sort(cs[season(cs) == s & cs <= DATA_DATE]), 3)
+  setNames(m[1, as.character(x)], int_to_term(x)) }
+last3(m_mcm, "FA"); mean(last3(m_mcm, "FA"))
+last3(m_mcm, "SP"); mean(last3(m_mcm, "SP"))
+last3(m_mcc, "FA"); mean(last3(m_mcc, "FA"))
+last3(m_mcc, "SP"); mean(last3(m_mcc, "SP"))
+```
+
+# 10. Charge, aid, net per term
+
+The CSV has `ntr` and `institutional_grant`. Gross is taken as ntr + grant. The generator's fee is
+already inside ntr, so the comprehensive fee is set to 0 to avoid counting it twice.
+
+Rows used: fall entrants in their entering term.
+
+```{r money}
+money <- function(r) {
+  er <- r[r$term_code == r$cohort_term & grepl("FA$", r$cohort_term), ]
+  charge <- mean(er$ntr + er$institutional_grant)
+  c(rows = nrow(er), mean_ntr = mean(er$ntr), mean_grant = mean(er$institutional_grant),
+    charge = charge, charge_rounded = round(charge),
+    aid_rate = mean(er$institutional_grant) / charge,
+    net = round(charge) * (1 - round(mean(er$institutional_grant) / charge, 6)))
+}
+round(money(mcm_r), 6)
+round(money(mcc_r), 6)
+```
+
+Spread of the inputs:
+
+```{r money-spread}
+summary(mcm_r$ntr); summary(mcm_r$institutional_grant)
+summary(mcc_r$ntr); summary(mcc_r$institutional_grant)
+summary((mcm_r$institutional_grant) / (mcm_r$ntr + mcm_r$institutional_grant))
+```
+
+Mean ntr by term, all MCM undergraduate records (to see whether price moves over time):
+
+```{r ntr-by-term}
+x <- tapply(mcm_r$ntr, mcm_r$term_code, mean)
+round(x[order(names(x))])
+```
+
+# 11. Four-year NTR per entering class (the calculator)
+
+Same arithmetic as `computeEntrantProjection` in `src/utils/calculator.ts`, at the default inputs
+(no retention shift, multiplier 1). Student-terms are summed over the first 4 years
+(d = 0 to 11 on MCM, 0 to 7 on MCC). Aid percent is rounded to 2 decimals, as the calculator's
+input box does.
+
+```{r calculator}
+calc <- function(r, rates, tpy, entering) {
+  mo <- money(r); charge <- unname(mo["charge_rounded"])
+  aid_pct <- round(round(unname(mo["aid_rate"]), 6) * 100, 2)
+  net <- charge - charge * aid_pct / 100
+  # rebuild the curve from the 6-decimal rates the site stores, without rounding (as the calculator does)
+  rr <- round(ifelse(is.na(rates[-1, "FA"]), 0, rates[-1, "FA"]), 6)
+  p <- numeric(length(rr) + 1); p[1] <- 1
+  for (k in seq_along(rr)) p[k + 1] <- p[k + 1 - ref_offset(term_to_int("2025FA"), k, tpy)] * rr[k]
+  yrs <- data.frame(year = 1:4)
+  yrs$student_terms <- sapply(1:4, function(y) entering * sum(p[(y - 1) * tpy + 1:tpy]))
+  yrs$entry_heads <- sapply(1:4, function(y) round(entering * p[(y - 1) * tpy + 1]))
+  yrs$ntr <- yrs$student_terms * net
+  yrs$gross <- yrs$student_terms * charge
+  yrs$aid <- yrs$student_terms * charge * aid_pct / 100
+  list(inputs = c(entering = entering, charge = charge, aid_pct = aid_pct, net_per_term = net),
+       years = yrs,
+       totals = c(student_terms = sum(yrs$student_terms), ntr = sum(yrs$ntr),
+                  ntr_per_entrant = sum(yrs$ntr) / entering, year1_share = yrs$ntr[1] / sum(yrs$ntr),
+                  y2_fall_retention = p[tpy + 1]))
+}
+c_mcm <- calc(mcm_r, r_mcm, 3L, unname(ent_mcm["2025FA"]))
+c_mcc <- calc(mcc_r, r_mcc, 2L, unname(ent_mcc["2025FA"]))
+c_mcm
+c_mcc
+```
+
+The curve here is rebuilt from the 6-decimal rates in `computed.json` without rounding, the same way
+the calculator builds it. The 4-decimal `persistence_curve` in section 8 gives totals a few thousand
+dollars different.
+
+# 12. Census projection, 2025SU to 2026FA
+
+Unobserved cells are filled with (reference cell) x (rate for that step and entry season). The census
+is the sum along each calendar-term diagonal.
+
+## MCM
+
+```{r proj-mcm}
+p_mcm <- project_segment(m_mcm, r_mcm, 3L, DATA_DATE, ent_mcm)
+round(p_mcm$heads, 1)
+h_mcm <- headcount_by_term(p_mcm)
+h_mcm[h_mcm$term %in% c("2024FA", "2025SP", "2025SU", "2025FA", "2026SP", "2026SU", "2026FA"), ]
+```
+
+Only cohorts 2021FA and later reach these census terms within 12 steps. Contributions to 2025FA:
+
+```{r contrib-mcm}
+contrib <- function(p, term) {
+  cs <- as.integer(colnames(p$heads)); out <- c()
+  for (j in seq_along(cs)) for (k in 0:(nrow(p$heads) - 1L))
+    if (int_to_term(cal_term(cs[j], k, p$tpy)) == term)
+      out <- rbind(out, data.frame(cohort = int_to_term(cs[j]), d = k, heads = round(p$heads[k + 1L, j], 2),
+                                   observed = p$observed[k + 1L, j]))
+  out
+}
+contrib(p_mcm, "2025FA"); sum(contrib(p_mcm, "2025FA")$heads)
+contrib(p_mcm, "2026FA"); sum(contrib(p_mcm, "2026FA")$heads)
+```
+
+Census NTR at the net per term from section 10:
+
+```{r census-ntr-mcm}
+net_mcm <- c_mcm$inputs[["net_per_term"]]
+x <- h_mcm[h_mcm$term %in% c("2025SU", "2025FA", "2026SP", "2026SU", "2026FA"), ]
+x$ntr_m <- round(x$heads * net_mcm / 1e6, 2); x
+```
+
+## MCC
+
+```{r proj-mcc}
+p_mcc <- project_segment(m_mcc, r_mcc, 2L, DATA_DATE, ent_mcc)
+round(p_mcc$heads, 1)
+h_mcc <- headcount_by_term(p_mcc)
+h_mcc[h_mcc$term %in% c("2024FA", "2025SP", "2025FA", "2026SP", "2026FA"), ]
+contrib(p_mcc, "2025FA"); sum(contrib(p_mcc, "2025FA")$heads)
+net_mcc <- c_mcc$inputs[["net_per_term"]]
+x <- h_mcc[h_mcc$term %in% c("2025FA", "2026SP", "2026FA"), ]
+x$ntr_m <- round(x$heads * net_mcc / 1e6, 2); x
+```
+
+## Longer horizon, for reference (not on the site)
+
+```{r long-horizon}
+h_mcm[grepl("FA$", h_mcm$term) & h_mcm$term >= "2025FA", ]
+h_mcc[grepl("FA$", h_mcc$term) & h_mcc$term >= "2025FA", ]
+```
+
+Past 2026FA every census is a mix of placeholders and projections, and the matrix only tracks 12 (MCM)
+or 8 (MCC) terms per cohort, so older cohorts drop out of the sum.
+
+# 13. Backtest
+
+Rates estimated with data through 2023FA. Entering classes after that set to their actual sizes.
+Projected census compared with the actual census from the same matrix (same d limit).
+
+```{r backtest}
+backtest <- function(m, tpy, cut_term, check_terms) {
+  cut <- term_to_int(cut_term)
+  r <- segment_rates(m, tpy, cut)
+  cs <- as.integer(colnames(m)); later <- cs[cs > cut & cs <= DATA_DATE]
+  ent <- setNames(m[1, as.character(later)], int_to_term(later))
+  pr <- headcount_by_term(project_segment(m, r, tpy, cut, ent))
+  ac <- headcount_by_term(project_segment(m, segment_rates(m, tpy, DATA_DATE), tpy, DATA_DATE))
+  out <- data.frame(term = check_terms,
+                    projected = pr$heads[match(check_terms, pr$term)],
+                    actual = ac$heads[match(check_terms, ac$term)])
+  out$error_pct <- round(100 * (out$projected - out$actual) / out$actual, 1)
+  out
+}
+backtest(m_mcm, 3L, "2023FA", c("2024SP", "2024SU", "2024FA", "2025SP"))
+backtest(m_mcc, 2L, "2023FA", c("2024SP", "2024FA", "2025SP"))
+```
+
+Same check from an earlier cutoff:
+
+```{r backtest-early}
+backtest(m_mcm, 3L, "2022FA", c("2023SP", "2023SU", "2023FA", "2024SP", "2024SU", "2024FA", "2025SP"))
+backtest(m_mcc, 2L, "2022FA", c("2023SP", "2023FA", "2024SP", "2024FA", "2025SP"))
+```
+
+The synthetic generator uses stable rates, so these errors are smaller than real data would give.
+
+# 14. Compare with the site's data file
+
+`src/data/computed.json` is what the site reads. Each value below is recalculated here and compared.
+
+```{r compare}
+j <- jsonlite::fromJSON("src/data/computed.json", simplifyVector = TRUE)
+j$source
+chk <- function(label, site, here, tol = 1e-6) {
+  ok <- length(site) == length(here) && all(abs(as.numeric(site) - as.numeric(here)) <= tol)
+  data.frame(item = label, match = ok)
+}
+z <- function(x) ifelse(is.na(x), 0, x)
+rbind(
+  chk("records", j$source$records, nrow(d), 0),
+  chk("students", j$source$students, length(unique(d$student_id)), 0),
+  chk("MCM FA rates", j$entrant$schools$MCM$rates, round(z(r_mcm[-1, "FA"]), 6)),
+  chk("MCM SP rates", j$cohort_matrix$MCM$spRates$noCovid, round(z(r_mcm[-1, "SP"]), 6)),
+  chk("MCM FA rates with COVID", j$cohort_matrix$MCM$rates$withCovid, round(z(r_mcm_cov[-1, "FA"]), 6)),
+  chk("MCC FA rates", j$entrant$schools$MCC$rates, round(z(r_mcc[-1, "FA"]), 6)),
+  chk("MCC SP rates", j$cohort_matrix$MCC$spRates$noCovid, round(z(r_mcc[-1, "SP"]), 6)),
+  chk("MCM curve", j$entrant$schools$MCM$curve, pc_mcm_fa$persistence),
+  chk("MCC curve", j$entrant$schools$MCC$curve, pc_mcc_fa$persistence),
+  chk("MCM entering", j$entrant$schools$MCM$entering, ent_mcm[["2025FA"]], 0),
+  chk("MCC entering", j$entrant$schools$MCC$entering, ent_mcc[["2025FA"]], 0),
+  chk("MCM charge", j$entrant$schools$MCM$charge_per_term, money(mcm_r)[["charge_rounded"]], 0),
+  chk("MCC charge", j$entrant$schools$MCC$charge_per_term, money(mcc_r)[["charge_rounded"]], 0),
+  chk("MCM aid rate", j$entrant$schools$MCM$aid_rate, round(money(mcm_r)[["aid_rate"]], 6)),
+  chk("MCC aid rate", j$entrant$schools$MCC$aid_rate, round(money(mcc_r)[["aid_rate"]], 6)),
+  chk("MCM summer uptake", j$cohort_matrix$MCM$summer_uptake, round(r_mcm["2", "FA"], 4))
+)
+```
+
+Cohort counts in the inspector against the matrix:
+
+```{r compare-cohorts}
+cmp_cohorts <- function(jc, m) {
+  do.call(rbind, lapply(seq_len(nrow(jc)), function(i) {
+    ct <- jc$cohortTerm[i]; ob <- jc$observed[[i]]
+    if (length(ob) == 0) return(data.frame(cohort = ct, entrants = jc$entrants[i], cells = 0, match = NA))
+    ks <- as.integer(names(ob)); heads <- sapply(ob, function(o) o$heads)
+    data.frame(cohort = ct, entrants = jc$entrants[i], cells = length(ks),
+               match = all(heads == m[ks + 1L, as.character(term_to_int(ct))]))
+  }))
+}
+jj <- jsonlite::fromJSON("src/data/computed.json", simplifyVector = FALSE)
+as_df <- function(cl) data.frame(cohortTerm = sapply(cl, `[[`, "cohortTerm"),
+                                 entrants = sapply(cl, `[[`, "entrants"),
+                                 observed = I(lapply(cl, `[[`, "observed")))
+cmp_cohorts(as_df(jj$cohort_matrix$MCM$cohorts), m_mcm)
+cmp_cohorts(as_df(jj$cohort_matrix$MCC$cohorts), m_mcc)
+```
+
+Census totals the inspector should show (from section 12):
+
+```{r site-census}
+h_mcm[h_mcm$term %in% c("2025SU", "2025FA", "2026SP", "2026SU", "2026FA"), c("term", "heads")]
+h_mcc[h_mcc$term %in% c("2025FA", "2026SP", "2026FA"), c("term", "heads")]
+```
+
+# 15. Not on the site
+
+Items with no calculation behind them were removed or left as flagged:
+
+- 2030 fall NTR scenarios (cliff, flat, northeast): no source in the engine. Hidden.
+- Standing report (discount tiers, vintage table, risk cells): typed figures, no source. Hidden.
+- Calculator's plus/minus 2.5 point band, the 0.5 to 1.15 multiplier limits, and the 0.25 scaling of
+  the shift on summer steps: site choices, not from the data or the notebook.
+- Inspector, non-baseline runs (offset 1, or COVID included): observed cells are rescaled by the ratio
+  of the two rate sets. That is a site choice, not the notebook's method.
+
+```{r session}
+sessionInfo()
+```
